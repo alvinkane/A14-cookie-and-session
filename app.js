@@ -2,6 +2,9 @@ const express = require("express");
 const exphbs = require("express-handlebars");
 const mongoose = require("mongoose");
 
+// 取得cookie
+const cookieParser = require("cookie-parser");
+
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -29,12 +32,19 @@ app.set("view engine", "hbs");
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cookieParser());
+
 app.get("/", (req, res) => {
-  res.render("index");
+  // 設定是否登入
+  const isLogin = 0;
+  res.render("index", isLogin);
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+  // 設定cookie參數
+  res.cookie("email", req.body.email, { path: "/login", maxAge: 600000 });
+  res.cookie("password", req.body.password, { path: "/login", maxAge: 600000 });
   // 用於判斷是否正確
   let index = 0;
   User.findOne({ email, password })
@@ -53,6 +63,7 @@ app.post("/login", (req, res) => {
 
 app.get("/login/:id", (req, res) => {
   const id = req.params.id;
+
   User.findById(id)
     .lean()
     .then((user) => {
