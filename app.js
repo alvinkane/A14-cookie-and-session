@@ -4,7 +4,10 @@ const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 
 // 取得session
-const expressSession = require("express-session");
+const session = require("express-session");
+
+// 連結express-session跟資料庫
+const MongoStore = require("connect-mongo");
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -34,8 +37,12 @@ app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
-  expressSession({
+  session({
     secret: "Secret",
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+      mongoOptions: { useUnifiedTopology: true },
+    }),
     saveUninitialized: true,
     resave: false,
     cookie: { maxAge: 600000 },
