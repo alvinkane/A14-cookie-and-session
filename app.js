@@ -1,6 +1,7 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
 const mongoose = require("mongoose");
+const methodOverride = require("method-override");
 
 // 取得cookie
 const cookieParser = require("cookie-parser");
@@ -34,10 +35,15 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
+app.use(methodOverride("_method"));
+
 app.get("/", (req, res) => {
   // 設定是否登入
-  const isLogin = 0;
-  res.render("index", isLogin);
+  let isLogin = 0;
+  if (req.cookies.email && req.cookies.password) {
+    isLogin = 1;
+  }
+  res.render("index", { isLogin });
 });
 
 app.get("/login", (req, res) => {
@@ -47,8 +53,8 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   // 設定cookie參數
-  res.cookie("email", req.body.email, { path: "/login", maxAge: 600000 });
-  res.cookie("password", req.body.password, { path: "/login", maxAge: 600000 });
+  res.cookie("email", req.body.email, { path: "/", maxAge: 600000 });
+  res.cookie("password", req.body.password, { path: "/", maxAge: 600000 });
   // 用於判斷是否正確
   let index = 0;
   User.findOne({ email, password })
@@ -82,6 +88,13 @@ app.get("/login/:id", (req, res) => {
     .catch((err) => {
       console.log(err);
     });
+});
+
+// 登出後刪除cookie
+app.delete("/logout", (req, res) => {
+  res.clearCookie("email", { path: "/" });
+  res.clearCookie("password", { path: "/" });
+  res.redirect("/");
 });
 
 app.listen(port, () => {

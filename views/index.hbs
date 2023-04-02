@@ -1,4 +1,15 @@
-<form action="/login" class="d-flex justify-content-end mt-2" role="login">
-  <button class="btn btn-outline-success" type="submit">Login</button>
-</form>
+{{#if isLogin}}
+  <form
+    action="/logout?_method=DELETE"
+    method="POST"
+    class="d-flex justify-content-end mt-2"
+    role="login"
+  >
+    <button class="btn btn-outline-success" type="submit">Logout</button>
+  </form>
+{{else}}
+  <form action="/login" class="d-flex justify-content-end mt-2" role="login">
+    <button class="btn btn-outline-success" type="submit">Login</button>
+  </form>
+{{/if}}
 <h1>User Authentication test</h1>
