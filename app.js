@@ -3,8 +3,8 @@ const exphbs = require("express-handlebars");
 const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 
-// 取得cookie
-const cookieParser = require("cookie-parser");
+// 取得session
+const expressSession = require("express-session");
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -33,14 +33,21 @@ app.set("view engine", "hbs");
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser("123456789"));
+app.use(
+  expressSession({
+    secret: "Secret",
+    saveUninitialized: true,
+    resave: false,
+    cookie: { maxAge: 600000 },
+  })
+);
 
 app.use(methodOverride("_method"));
 
 app.get("/", (req, res) => {
   // 設定是否登入
   let isLogin = 0;
-  if (req.signedCookies.email && req.signedCookies.password) {
+  if (req.session.email && req.session.password) {
     isLogin = 1;
   }
   res.render("index", { isLogin });
@@ -52,17 +59,9 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  // 設定cookie參數
-  res.cookie("email", req.body.email, {
-    path: "/",
-    signed: true,
-    maxAge: 600000,
-  });
-  res.cookie("password", req.body.password, {
-    path: "/",
-    signed: true,
-    maxAge: 600000,
-  });
+  // 設定session參數
+  req.session.email = req.body.email;
+  req.session.password = req.body.password;
   // 用於判斷是否正確
   let index = 0;
   User.findOne({ email, password })
@@ -100,8 +99,9 @@ app.get("/login/:id", (req, res) => {
 
 // 登出後刪除cookie
 app.delete("/logout", (req, res) => {
-  res.clearCookie("email", { path: "/" });
-  res.clearCookie("password", { path: "/" });
+  req.session.destroy(() => {
+    console.log("session is deleted");
+  });
   res.redirect("/");
 });
 
