@@ -40,6 +40,10 @@ app.get("/", (req, res) => {
   res.render("index", isLogin);
 });
 
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   // 設定cookie參數
@@ -53,7 +57,7 @@ app.post("/login", (req, res) => {
         res.redirect(`/login/${user._id}`);
       } else {
         index = 1;
-        res.render("index", { email, password, index });
+        res.render("login", { email, password, index });
       }
     })
     .catch((err) => {

@@ -1,0 +1,30 @@
+<form action="/login" method="POST" novalidate>
+  <div class="row">
+    <a href="/" class="navbar-brand fs-1 mt-5">Account Login</a>
+  </div>
+  <div class="row m-3">
+    <input
+      type="email"
+      name="email"
+      placeholder="Email"
+      value="{{email}} "
+      class="form-control mx-auto"
+      style="width: 20em"
+      required
+    />
+  </div>
+  <div class="row m-3">
+    <input
+      type="password"
+      name="password"
+      placeholder="Password"
+      value="{{password}}"
+      class="form-control mx-auto"
+      style="width: 20em"
+      required
+    />
+  </div>
+  {{#if index}}<h5 class="text-danger" style="font-size: 1em">Please input a
+      valid email or password.</h5>{{/if}}
+  <button class="btn btn-outline-dark">Sign in</button>
+</form>
