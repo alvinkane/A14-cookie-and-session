@@ -33,14 +33,14 @@ app.set("view engine", "hbs");
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser());
+app.use(cookieParser("123456789"));
 
 app.use(methodOverride("_method"));
 
 app.get("/", (req, res) => {
   // 設定是否登入
   let isLogin = 0;
-  if (req.cookies.email && req.cookies.password) {
+  if (req.signedCookies.email && req.signedCookies.password) {
     isLogin = 1;
   }
   res.render("index", { isLogin });
@@ -53,8 +53,16 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   // 設定cookie參數
-  res.cookie("email", req.body.email, { path: "/", maxAge: 600000 });
-  res.cookie("password", req.body.password, { path: "/", maxAge: 600000 });
+  res.cookie("email", req.body.email, {
+    path: "/",
+    signed: true,
+    maxAge: 600000,
+  });
+  res.cookie("password", req.body.password, {
+    path: "/",
+    signed: true,
+    maxAge: 600000,
+  });
   // 用於判斷是否正確
   let index = 0;
   User.findOne({ email, password })
